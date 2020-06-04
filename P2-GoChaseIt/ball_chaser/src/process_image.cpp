@@ -24,10 +24,10 @@ void process_image_callback(const sensor_msgs::Image img)
 {
     int ball_dir;
     bool ball_found = false;
-    int white_pixel = 255;
+    int white_pixel[] = {255,255,255};
     float left_region_max = (float) img.step/3;
     float mid_region_max = (float) 2*img.step/3;
-
+    const int num_channels = 3;
     // printf("left region max %f\n", left_region_max);
     // printf("mid region max %f\n", mid_region_max);
 
@@ -36,10 +36,10 @@ void process_image_callback(const sensor_msgs::Image img)
     // Depending on the white ball position, call the drive_bot function and pass velocities to it
     // Request a stop when there's no white ball seen by the camera
     
-    // Loop through each pixel in the image and check if its equal to the first one
-    for (int i = 0; i < img.height * img.step; i++) {
-        if (img.data[i] == white_pixel) {
-            ball_dir = i % img.step;
+    for (int i = 0; i < img.height * img.width; i++) {
+        int img_pixel[] = {img.data[num_channels*i],img.data[num_channels*i+1],img.data[num_channels*i+2]};
+        if (img_pixel[0] == white_pixel[0] && img_pixel[1] == white_pixel[1] && img_pixel[2] == white_pixel[2]) {
+            ball_dir = (num_channels*i) % img.step;
             if (ball_dir > left_region_max && ball_dir < mid_region_max) { // mid region
                 drive_robot(.2,0);
             } 
